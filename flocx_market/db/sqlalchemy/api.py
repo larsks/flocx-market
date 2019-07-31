@@ -44,6 +44,11 @@ def offer_get(marketplace_offer_id, context):
             marketplace_offer_id=marketplace_offer_id).one_or_none()
 
 
+def offer_get_by_provider_offer_id(provider_offer_id, context):
+    return get_session().query(models.Offer).filter_by(
+            provider_offer_id=provider_offer_id).one_or_none()
+
+
 def offer_get_all(context):
     return get_session().query(models.Offer).all()
 
@@ -68,6 +73,13 @@ def offer_create(values, context):
     values['marketplace_offer_id'] = uuidutils.generate_uuid()
     offer_ref = models.Offer()
     offer_ref.update(values)
+
+    if 'timeslots' not in values:
+        offer_ref.timeslots.append(models.Timeslot(
+            offer_id=offer_ref.marketplace_offer_id,
+            start_time=offer_ref.start_time,
+            end_time=offer_ref.end_time,
+        ))
     offer_ref.save(get_session())
     return offer_ref
 

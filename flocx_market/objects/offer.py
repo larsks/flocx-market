@@ -36,6 +36,17 @@ class Offer(base.FLOCXMarketObject):
             else:
                 return cls._from_db_object(cls(), o)
 
+    @classmethod
+    def get_by_provider_offer_id(cls, offer_id, context):
+        if offer_id is None:
+            return None
+        else:
+            o = db.offer_get_by_provider_offer_id(offer_id, context)
+            if o is None:
+                return None
+            else:
+                return cls._from_db_object(cls(), o)
+
     def destroy(self, context):
         db.offer_destroy(self.marketplace_offer_id, context)
         return True

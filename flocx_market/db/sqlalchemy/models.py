@@ -60,6 +60,7 @@ class Offer(Base):
     server_id = orm.Column(orm.String(64), nullable=False, unique=True)
     start_time = orm.Column(orm.DateTime(timezone=True), nullable=False)
     end_time = orm.Column(orm.DateTime(timezone=True), nullable=True)
+    timeslots = orm.relationship('Timeslot')
     server_config = orm.Column(
         sqlalchemy_jsonfield.JSONField(enforce_string=True,
                                        enforce_unicode=False),
@@ -68,6 +69,22 @@ class Offer(Base):
     cost = orm.Column(orm.Float, nullable=False)
     offer_contract_relationships = orm.relationship(
         'OfferContractRelationship', lazy='dynamic')
+
+
+class Timeslot(Base):
+    __tablename__ = 'timeslots'
+    timeslot_id = orm.Column(orm.Integer,
+                             primary_key=True)
+    offer_id = orm.Column(orm.String(64), orm.ForeignKey(
+        'offers.marketplace_offer_id', ondelete='CASCADE'))
+    start_time = orm.Column(orm.DateTime(timezone=True), nullable=False)
+    end_time = orm.Column(orm.DateTime(timezone=True), nullable=True)
+
+    orm.UniqueConstraint('offer_id', 'start_time', 'end_time')
+
+    def __repr__(self):
+        return ('<timeslot o {0.offer_id} '
+                's {0.start_time} e {0.end_time}>'.format(self))
 
 
 class Contract(Base):
